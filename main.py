@@ -4,16 +4,17 @@ from pydantic import BaseModel
 import groq
 import os
 
-app = FastAPI()
+app = FastAPI(title="CodeNova AI")
 
+# 🔥 CORS FIX - Allow ALL origins (mobile app ke liye)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # ALL origins allowed
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# API key from environment variable
 client = groq.Groq(api_key=os.environ["GROQ_API_KEY"])
 
 class ChatRequest(BaseModel):
@@ -34,4 +35,9 @@ async def chat(request: ChatRequest):
 
 @app.get("/")
 def root():
-    return {"status": "CodeNova AI Running!"}
+    return {"message": "CodeNova AI is running!", "status": "online"}
+
+# Health check for wake-up
+@app.get("/health")
+def health():
+    return {"status": "healthy"}
